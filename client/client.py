@@ -5,6 +5,7 @@ READ_FILE_BYTES = 'rb'
 PACKET_HEADER = '01111110'
 PACKET_LENGTH = 1024
 BYTE_LENGTH = 8
+CRC = '11101'
 # DATA_LENGTH is the length of data we can send in one
 # packet, so it is PACKET_LENGTH - size of header - counter (1 byte)
 DATA_LENGTH = 1024 - len(PACKET_HEADER) - BYTE_LENGTH
@@ -28,7 +29,7 @@ def create_packets(binary):
 	packet = ''
 	counter = 0
 	while binary:
-		packet = PACKET_HEADER + get_binary(counter) + binary[:DATA_LENGTH]
+		packet = PACKET_HEADER + get_binary(counter) + binary[:DATA_LENGTH] + CRC
 		binary = binary[DATA_LENGTH:]
 		counter += 1
 		packets.append(packet)

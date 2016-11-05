@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/ClaytonNorthey92/ECE-570-Project-1/issues"
   },
-  "homepage": "https://github.com/ClaytonNorthey92/ECE-570-Project-1#readme"
+  "homepage": "https://github.com/ClaytonNorthey92/ECE-570-Project-1#readme",
+  "dependencies": {
+    "nodejs-websocket": "^1.7.0"
+  }
 }

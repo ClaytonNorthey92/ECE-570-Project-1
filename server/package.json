@@ -1,0 +1,19 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Server-side program for Project 1.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ClaytonNorthey92/ECE-570-Project-1.git"
+  },
+  "author": "Clayton Northey",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ClaytonNorthey92/ECE-570-Project-1/issues"
+  },
+  "homepage": "https://github.com/ClaytonNorthey92/ECE-570-Project-1#readme"
+}

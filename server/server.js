@@ -8,7 +8,7 @@ var serverLog = function(message){
 	console.log(Date.now() + ' --- ', message);
 }
 
-serverLog('Starting server on port ', config.PORT_NUMBER);
+serverLog('Starting server on port ' + config.PORT_NUMBER);
 
 var servert = websocket.createServer(function(connection){
 	serverLog('Connection opened.');

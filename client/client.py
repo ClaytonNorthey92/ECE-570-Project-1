@@ -6,12 +6,15 @@ PACKET_HEADER = '01111110'
 PACKET_LENGTH = 1024
 BYTE_LENGTH = 8
 CRC = '11101'
+END_BIT = '1\n'
 # DATA_LENGTH is the length of data we can send in one
 # packet, so it is PACKET_LENGTH - size of header - counter (1 byte)
 DATA_LENGTH = 1024 - len(PACKET_HEADER) - BYTE_LENGTH
 
 def get_binary(input):
 	binary = '{0:b}'.format(input)
+	if (len(binary) > 8):
+		print(binary)
 	return '0'*(BYTE_LENGTH-len(binary)) + binary
 
 def get_file_binary_string(file_path):
@@ -21,6 +24,8 @@ def get_file_binary_string(file_path):
 	binary_representation = ''
 	for byte in data:
 		binary_form = get_binary(byte)
+		if (len(binary_form) > 8):
+			print(binary_form)
 		binary_representation += binary_form
 	return binary_representation
 
@@ -42,4 +47,5 @@ if __name__=='__main__':
 	packets = create_packets(binary)
 	for packet in packets:
 		socket.send(packet)
+	socket.send(END_BIT + UM_DEARBORN_LOGO_PATH)
 	

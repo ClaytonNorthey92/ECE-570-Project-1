@@ -8,9 +8,10 @@ var config = {
 	HEADER_END: 8,
 	COUNTER_START: 8,
 	COUNTER_END: 16,
-	CRC_LENGTH: 5,
 	BYTE_LENGTH: 8,
-	WAV_LENGTH: 16
+	WAV_LENGTH: 16,
+	DIVISOR: '11101',
+	CRC_LENGTH: 4,
 };
 
 var serverLog = function(message){
@@ -26,8 +27,25 @@ var get_counter = function(input_string){
 	return parseInt(counter, 2);
 }
 
-var get_CRC = function(input_string){
-	return input_string.substring(input_string.length - config.CRC_LENGTH);
+var validate_CRC = function(input_string){
+	var length = input_string.length;
+	var divisor_length = config.DIVISOR.length;
+	var offset = divisor_length;
+	var numerator = input_string.substring(0, offset);
+	var new_numerator = '';
+	while (offset <= length){
+		for (var i=0;i<divisor_length;i++){
+			new_numerator = new_numerator + (numerator[i]===config.DIVISOR[i] ? 0 : 1);
+		}
+		numerator = new_numerator.substring(1);
+		new_numerator = '';
+		if (offset === length){
+			break;
+		}
+		numerator += input_string[offset];
+		offset++;
+	}
+	return numerator === '0000';
 }
 
 var get_data = function(input_string){
@@ -65,11 +83,11 @@ var get_sample_length = function(file_name){
 
 serverLog('Starting server on port ' + config.PORT_NUMBER);
 
-var servert = websocket.createServer(function(connection){
+var server = websocket.createServer(function(connection){
 	serverLog('Connection opened.');
 	var fullData = '';
 	connection.on('text', function(input_string){
-		var counter, crc, data, header;
+		var counter, valid, data, header;
 		if (input_string.substring(0,2) === '1\n'){
 			var sample_length = get_sample_length(input_string);
 			serverLog('End bit received, assembling file.');
@@ -91,14 +109,20 @@ var servert = websocket.createServer(function(connection){
 				}
 			});
 			fullData = '';
+			connection.send('1');
 		} else {
+			valid = validate_CRC(input_string);
 			counter = get_counter(input_string);
-			crc = get_CRC(input_string);
-			data = get_data(input_string);
-			serverLog('message ' + input_string)
-			serverLog('data '+ data);
-			header = get_header(input_string);
-			fullData = fullData + data;
+			if (!valid){
+				serverLog('Message is invalid!');
+				connection.send('0')
+			} else {
+				serverLog('Message is valid.');
+				data = get_data(input_string);
+				header = get_header(input_string);
+				fullData = fullData + data;
+				connection.send('1');
+			}
 		}
 	});
 	connection.on('close', function(code, reason){

@@ -55,7 +55,7 @@ var get_sample_length = function(file_name){
 	var sample_length;
 	if (file_name.endsWith('.wav')){
 		sample_length = config.WAV_LENGTH;
-	} else if (file_name.endsWith('.jpg')){
+	} else if (file_name.endsWith('.jpg') || file_name.endsWith('jpeg')){
 		sample_length = config.BYTE_LENGTH;
 	} else {
 		serverLog('Could not determine file format.')

@@ -45,7 +45,11 @@ var validate_CRC = function(input_string){
 		numerator += input_string[offset];
 		offset++;
 	}
-	return numerator === '0000';
+	var valid = '0000' === numerator;
+	if (!valid){
+		serverLog('Message invalid with remainder: ' + numerator);
+	}
+	return valid;
 }
 
 var get_data = function(input_string){
@@ -120,6 +124,11 @@ var server = websocket.createServer(function(connection){
 				serverLog('Message is valid.');
 				data = get_data(input_string);
 				header = get_header(input_string);
+				file_system.writeFile('message_log/' + Date.now() + '.log', input_string, (error)=>{
+					if (error){
+						serverLog('An error has occured writing to file ' + error);
+					}
+				});
 				fullData = fullData + data;
 				connection.send('1');
 			}

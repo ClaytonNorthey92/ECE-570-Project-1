@@ -1,3 +1,7 @@
 server/node_modules/
 client/client_env/
 *.log
+server/detroit-lions-logo.jpeg
+server/umdlogo.jpg
+server/bugsbunny1.wav
+server/error_umdlogo.jpg

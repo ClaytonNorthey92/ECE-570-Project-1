@@ -9,7 +9,8 @@ var config = {
 	COUNTER_START: 8,
 	COUNTER_END: 16,
 	CRC_LENGTH: 5,
-	BITE_LENGTH: 8
+	BYTE_LENGTH: 8,
+	WAV_LENGTH: 16
 };
 
 var serverLog = function(message){
@@ -22,7 +23,6 @@ var get_header = function(input_string){
 
 var get_counter = function(input_string){
 	var counter = input_string.substring(config.COUNTER_START, config.COUNTER_END);
-	console.log(counter);
 	return parseInt(counter, 2);
 }
 
@@ -34,17 +34,33 @@ var get_data = function(input_string){
 	return input_string.substring(config.COUNTER_END, (input_string.length) - config.CRC_LENGTH);
 }
 
-var fill_buffer = function(buffer, data){
-	var start = 0, end = config.BITE_LENGTH;
+var fill_buffer = function(buffer, data, sample_length){
+	var start = 0, end = sample_length;
 	var buffer_position = 0;
 	var this_byte;
 	while (start<data.length){
 		this_byte = conversion.stringToByte(data.substring(start, end));
-		buffer.writeUInt8(this_byte, buffer_position);
-		start += config.BITE_LENGTH;
-		end += config.BITE_LENGTH;
+		if (sample_length === config.BYTE_LENGTH){
+			buffer.writeUInt8(this_byte, buffer_position);
+		} else {
+			buffer.writeUInt16LE(this_byte, buffer_position);
+		}
+		start += sample_length;
+		end += sample_length;
 		buffer_position++;
 	}
+}
+
+var get_sample_length = function(file_name){
+	var sample_length;
+	if (file_name.endsWith('.wav')){
+		sample_length = config.WAV_LENGTH;
+	} else if (file_name.endsWith('.jpg')){
+		sample_length = config.BYTE_LENGTH;
+	} else {
+		serverLog('Could not determine file format.')
+	}
+	return sample_length;
 }
 
 serverLog('Starting server on port ' + config.PORT_NUMBER);
@@ -54,23 +70,33 @@ var servert = websocket.createServer(function(connection){
 	var fullData = '';
 	connection.on('text', function(input_string){
 		var counter, crc, data, header;
-		serverLog('Message received: ' + input_string);
 		if (input_string.substring(0,2) === '1\n'){
+			var sample_length = get_sample_length(input_string);
 			serverLog('End bit received, assembling file.');
-			var buffer = new Buffer(fullData.length/config.BITE_LENGTH);
-			fill_buffer(buffer, fullData);
+			serverLog(fullData.length/sample_length)
+			var buffer;
+			var buffer_length = Math.ceil(fullData.length/sample_length + 1);
+			if (sample_length === config.BYTE_LENGTH){
+				buffer = new Buffer(buffer_length);
+			} else {
+				var array = new Uint16Array(buffer_length );
+				buffer = Buffer.from(array);
+
+			}
+			fill_buffer(buffer, fullData, sample_length);
 			serverLog(buffer);
 			file_system.writeFile(input_string.replace('1\n', ''), buffer, (error)=>{
 				if (error){
 					serverLog('An error has occured writing to file ' + error);
 				}
 			});
-
+			fullData = '';
 		} else {
 			counter = get_counter(input_string);
 			crc = get_CRC(input_string);
 			data = get_data(input_string);
-			serverLog("data " + data);
+			serverLog('message ' + input_string)
+			serverLog('data '+ data);
 			header = get_header(input_string);
 			fullData = fullData + data;
 		}

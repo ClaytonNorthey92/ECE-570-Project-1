@@ -88,7 +88,7 @@ def package_and_send(file_name, socket, create_error=False):
 
 if __name__=='__main__':
 	socket = websocket.WebSocket()
-	socket.connect('ws://localhost:3000')
+	socket.connect('ws://130.211.141.185:3000')
 	package_and_send(LIONS_LOGO,socket)
 	package_and_send(UM_DEARBORN_LOGO_PATH, socket)
 	package_and_send(BUGS_BUNNY_SOUND, socket)

@@ -75,9 +75,9 @@ var fill_buffer = function(buffer, data, sample_length){
 
 var get_sample_length = function(file_name){
 	var sample_length;
-	if (file_name.endsWith('.wav')){
+	if (file_name.indexOf('.wav') != -1){
 		sample_length = config.WAV_LENGTH;
-	} else if (file_name.endsWith('.jpg') || file_name.endsWith('jpeg')){
+	} else if (file_name.indexOf('.jpg') != -1 || file_name.indexOf('jpeg') != -1){
 		sample_length = config.BYTE_LENGTH;
 	} else {
 		serverLog('Could not determine file format.')
@@ -101,13 +101,11 @@ var server = websocket.createServer(function(connection){
 			if (sample_length === config.BYTE_LENGTH){
 				buffer = new Buffer(buffer_length);
 			} else {
-				var array = new Uint16Array(buffer_length );
-				buffer = Buffer.from(array);
-
+				buffer = Buffer(buffer_length);
 			}
 			fill_buffer(buffer, fullData, sample_length);
 			serverLog(buffer);
-			file_system.writeFile(input_string.replace('1\n', ''), buffer, (error)=>{
+			file_system.writeFile(input_string.replace('1\n', ''), buffer, function(error){
 				if (error){
 					serverLog('An error has occured writing to file ' + error);
 				}
@@ -121,10 +119,9 @@ var server = websocket.createServer(function(connection){
 				serverLog('Message is invalid!');
 				connection.send('0')
 			} else {
-				serverLog('Message is valid.');
 				data = get_data(input_string);
 				header = get_header(input_string);
-				file_system.writeFile('message_log/' + Date.now() + '.log', input_string, (error)=>{
+				file_system.writeFile('message_log/' + Date.now() + '.log', input_string, function(error){
 					if (error){
 						serverLog('An error has occured writing to file ' + error);
 					}

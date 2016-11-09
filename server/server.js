@@ -105,7 +105,7 @@ var server = websocket.createServer(function(connection){
 			}
 			fill_buffer(buffer, fullData, sample_length);
 			serverLog(buffer);
-			file_system.writeFile(input_string.replace('1\n', ''), buffer, function(error){
+			file_system.writeFile('output_static/' + input_string.replace('1\n', ''), buffer, function(error){
 				if (error){
 					serverLog('An error has occured writing to file ' + error);
 				}

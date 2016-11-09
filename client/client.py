@@ -79,7 +79,7 @@ def package_and_send(file_name, socket, create_error=False):
 		else:
 			socket.send(packet)
 		valid_response = socket.recv()
-		if valid_response == '0':
+		while valid_response == '0':
 			print('sending corrected packet')
 			socket.send(packet)
 			socket.recv()
@@ -94,4 +94,4 @@ if __name__=='__main__':
 	package_and_send(BUGS_BUNNY_SOUND, socket)
 	package_and_send(UM_DEARBORN_LOGO_PATH, socket, create_error=True)
 	socket.close()
-	
+

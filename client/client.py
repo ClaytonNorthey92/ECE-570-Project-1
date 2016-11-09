@@ -82,13 +82,14 @@ def package_and_send(file_name, socket, create_error=False):
 		while valid_response == '0':
 			print('sending corrected packet')
 			socket.send(packet)
-			socket.recv()
+			valid_response = socket.recv()
 	socket.send(END_BIT + error_name + file_name)
 	socket.recv()
 
 if __name__=='__main__':
 	socket = websocket.WebSocket()
 	socket.connect('ws://130.211.141.185:3000')
+	print('connected')
 	package_and_send(LIONS_LOGO,socket)
 	package_and_send(UM_DEARBORN_LOGO_PATH, socket)
 	package_and_send(BUGS_BUNNY_SOUND, socket)

@@ -1,5 +1,3 @@
-var test_bin = '10011100';
-
 
 var stringToByte = function(binary_string){
 	var total_int = 0;
@@ -9,8 +7,6 @@ var stringToByte = function(binary_string){
 	}
 	return total_int;
 }
-
-console.log(stringToByte(test_bin));
 
 module.exports = {
 	stringToByte: stringToByte
